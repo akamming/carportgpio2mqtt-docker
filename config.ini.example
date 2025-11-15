@@ -1,0 +1,44 @@
+[mqtt]
+# MQTT broker IP address or hostname
+broker = your_broker_ip_or_hostname
+# MQTT broker port (default 1883)
+port = 1883
+# Home Assistant discovery topic prefix
+hatopic = homeassistant
+# MQTT username (leave empty if no authentication)
+username = your_username
+# MQTT password (leave empty if no authentication)
+password = your_password
+# Quality of Service level (0, 1, or 2)
+qos = 0
+# Retain messages (True or False)
+retain = True
+
+[intervals]
+# Reconnect delay in seconds (currently not used in code, but configurable)
+reconnectdelay = 5
+# Publish interval in seconds (currently not used in code, but configurable)
+PublishInterval = 900
+
+[domoticz]
+# GPIO pin number for water meter pulse detection
+gpio_pin = 18
+# Domoticz device IDX for meter updates
+idx = your_domoticz_idx
+# File to store meter reading
+meterfile = meterstand.txt
+
+[main]
+# Script name used for MQTT topics
+script_name = gpio2mqtt
+# Comma-separated list of lamp names
+lampen = Lamp1,Lamp2
+# GPIO pin for each lamp (format: gpio_<lamp_name>)
+gpio_Lamp1 = 14
+# Active high setting for each lamp (True or False)
+active_high_Lamp1 = False
+gpio_Lamp2 = 15
+active_high_Lamp2 = False
+# Uncomment and configure additional lamps as needed
+# gpio_Lamp3 = 16
+# active_high_Lamp3 = True
