@@ -4,10 +4,10 @@ This project is a Python application that uses GPIO pins on a Raspberry Pi to de
 
 ## Features
 
-- **Water meter monitoring**: Detects pulses on a GPIO pin and sends meter readings to Domoticz.
+- **Water meter monitoring**: Detects pulses on a GPIO pin and sends meter readings to Domoticz and Home Assistant.
 - **Lamp control**: Switches GPIO-controlled lamps on/off via MQTT messages from Home Assistant.
 - **MQTT reconnect**: Periodically checks the MQTT connection and attempts automatic reconnection on loss.
-- **Home Assistant discovery**: Automatically publishes discovery messages for lamps.
+- **Home Assistant discovery**: Automatically publishes discovery messages for lamps and the water meter.
 - **Docker support**: Can be run in a Docker container for easy deployment.
 
 ## Requirements
@@ -91,7 +91,6 @@ active_high_Lamp1 = False
 ## Usage
 
 - The script starts automatically upon execution.
-- Water meter pulses are detected and sent to Domoticz.
+- Water meter pulses are detected and sent to Domoticz and the Home Assistant sensor. The sensor reports the cumulative pulse count; configure any volume conversion in Home Assistant according to your meter's pulse calibration.
 - Lamps can be switched via MQTT topics like `gpio2mqtt/light/Lamp1/set` with payload "ON" or "OFF".
 - Logs are displayed in the console.
-

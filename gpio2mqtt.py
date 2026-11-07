@@ -49,6 +49,7 @@ def on_connect(client, userdata, flags, rc, properties=None):
     if first_connect:
         publish_discovery(config)
         first_connect = False
+    publish_watermeter_state()
     subscribe_to_lights()
 
 def on_disconnect(client, userdata, rc):
@@ -78,6 +79,7 @@ def pulse_detected():
     logger.info(f"Pulse detected! Meterstand verhoogd van {current_value} naar {new_value}")
 
     write_meter_value(new_value)
+    publish_watermeter_state(new_value)
 
     payload = json.dumps({
         "command": "udevice",
@@ -121,7 +123,7 @@ def publish_discovery(config):
     hatopic = config.get("mqtt", "hatopic", fallback="homeassistant")
 
     device_info = {
-        "identifiers": [platform.node()],
+        "identifiers": "gpio2mqtt",
         "name": script_name,
         "model": platform.platform(),
         "manufacturer": "Raspberry Pi",
@@ -148,6 +150,35 @@ def publish_discovery(config):
 
         mqtt_client.publish(discovery_topic, json.dumps(payload), qos=mqtt_qos, retain=True)
         logger.info(f"Discovery bericht gepubliceerd naar: {discovery_topic}")
+
+    watermeter_discovery_topic = f"{hatopic}/sensor/{script_name}/watermeter/config"
+    watermeter_state_topic = f"{script_name}/watermeter/state"
+    watermeter_payload = {
+        "name": "Watermeter",
+        "unique_id": f"{script_name}_watermeter",
+        "device_class": "water",
+        "state_topic": watermeter_state_topic,
+        "state_class": "total_increasing",
+        "unit_of_measurement": "L",
+        "icon": "mdi:water",
+        "device": device_info,
+    }
+
+    mqtt_client.publish(
+        watermeter_discovery_topic,
+        json.dumps(watermeter_payload),
+        qos=mqtt_qos,
+        retain=True
+    )
+    logger.info(f"Watermeter discovery bericht gepubliceerd naar: {watermeter_discovery_topic}")
+
+def publish_watermeter_state(value=None):
+    if value is None:
+        value = read_meter_value()
+
+    state_topic = f"{script_name}/watermeter/state"
+    mqtt_client.publish(state_topic, str(value), qos=mqtt_qos, retain=True)
+    logger.info(f"Watermeterstand gepubliceerd naar [{state_topic}]: {value} pulses")
 
 def subscribe_to_lights():
     for name in lights.keys():
@@ -264,4 +295,3 @@ def signal_handler(sig, frame):
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, signal_handler)
     run()
-
